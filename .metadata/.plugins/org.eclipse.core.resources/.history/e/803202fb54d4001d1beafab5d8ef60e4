@@ -1,0 +1,113 @@
+package com.jetflix;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.io.FileInputStream;
+import java.io.File;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+
+public class VideoServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	 
+	  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	      throws ServletException, IOException {
+			  FileInputStream inputStream = new FileInputStream("/mnt/assets/20th_girl/pv.mp4");
+			  response.setContentType("video/mp4");
+			  ServletOutputStream outputStream = response.getOutputStream();
+			  byte[] buffer = new byte[4096];
+			  int bytesRead;
+			  while ((bytesRead = inputStream.read(buffer)) != -1) {
+			    outputStream.write(buffer, 0, bytesRead);
+			  }
+			  inputStream.close();
+			  outputStream.flush();
+			  outputStream.close();
+	  }
+	  
+	  protected void doPost(HttpServletRequest request, HttpServletResponse response)
+		      throws ServletException, IOException {
+		    response.setContentType("text/plain");
+		    PrintWriter out = response.getWriter();
+
+		    try {
+	    	Part backgroundPart = request.getPart("background");
+	        Part posterPart = request.getPart("poster");
+	        Part trailerPart = request.getPart("trailer");
+	        
+	        if (backgroundPart == null || posterPart == null || trailerPart == null) {
+	            throw new ServletException("Please select all files.");
+	          }
+	          // ADD TO MYSQL DATABASE
+	          String url = "jdbc:mysql://192.168.163.30:3306/assetDB";
+	          String username = "video_uploader";
+	          String password = "p@ssw0rd";
+	          
+	          String title = request.getParameter("title");
+	          String overview = request.getParameter("overview");
+	          System.out.print(title);
+	          Class.forName("com.mysql.cj.jdbc.Driver");
+	          try (Connection connection = DriverManager.getConnection(url, username, password)) {
+	              String sql = "INSERT INTO asset (title, overview) VALUES (?, ?)";
+	              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+	              stmt.setString(1, title);
+	              stmt.setString(2, overview);
+	              stmt.executeUpdate();
+	              ResultSet rs = stmt.getGeneratedKeys();
+	              int id = rs.next() ? rs.getInt(1) : 0;
+	              
+	              String bgPath = "/root/Desktop/test/" + id + "/";
+	              String posterPath = "/root/Desktop/test/" + id + "/";
+	              String videoPath = "/root/Desktop/test/" + id + "/";
+	              
+	              // FILE DOWNLOAD
+	              uploadFile(backgroundPart, bgPath);
+	              uploadFile(posterPart, posterPath);
+	              uploadFile(trailerPart, videoPath);   
+	              
+	              // UPDATE MYSQL WITH PATH
+	              sql = "UPDATE asset SET bgPath = ?, posterPath = ?, videoPath = ? WHERE id = ?";
+	              PreparedStatement updateStmt = connection.prepareStatement(sql);
+	              updateStmt.setString(1, bgPath);
+	              updateStmt.setString(2, posterPath);
+	              updateStmt.setString(3, videoPath);
+	              updateStmt.setInt(4, id);
+	              updateStmt.executeUpdate();
+	              
+	              out.print("File upload successful.");
+	            } catch (SQLException ex) {
+	              System.out.println("An error occurred while saving the video: " + ex.getMessage());
+	            }  
+		    } catch (Exception e) {
+		      out.print("File upload failed: " + e.getMessage());
+		    }
+		  }
+	  	
+	  		private void uploadFile(final Part part, String path) throws IOException {
+	  			  String fileName = getFileName(part);
+			      File file = new File(path + fileName);
+			      part.write(file.getAbsolutePath());
+			      System.out.print("File uploaded successfully!");
+	  		}
+		  private String getFileName(final Part part) {
+		    final String partHeader = part.getHeader("content-disposition");
+		    for (String content : partHeader.split(";")) {
+		      if (content.trim().startsWith("filename")) {
+		        return content.substring(content.indexOf('=') + 1).trim().replace("\"", "");
+		      }
+		    }
+		    return null;
+		  }
+}
+	

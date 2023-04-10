@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>videos</display-name>
+ <servlet>
+    <servlet-name>VideoServlet</servlet-name>
+    <servlet-class>com.jetflix.VideoServlet</servlet-class>
+    <multipart-config>
+    <max-file-size>100000000</max-file-size>
+    <max-request-size>100000000</max-request-size>
+    <file-size-threshold>0</file-size-threshold>
+  	</multipart-config>
+</servlet>
+<servlet-mapping>
+    <servlet-name>VideoServlet</servlet-name>
+    <url-pattern>/play</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+    <servlet-name>VideoServlet</servlet-name>
+    <url-pattern>/upload</url-pattern>
+</servlet-mapping>
+ <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+    <init-param>
+        <param-name>cors.allowed.origins</param-name>
+        <param-value>*</param-value>
+    </init-param>
+    <init-param>
+        <param-name>cors.allowed.methods</param-name>
+        <param-value>GET,POST,HEAD,OPTIONS,PUT</param-value>
+    </init-param>
+    <init-param>
+        <param-name>cors.allowed.headers</param-name>
+        <param-value>Content-Type,X-Requested-With,Accept,Accept-Encoding,Accept-Language,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,Connection,Host,authorization</param-value>
+    </init-param>
+    <init-param>
+        <param-name>cors.exposed.headers</param-name>
+        <param-value>Access-Control-Allow-Origin,Access-Control-Allow-Credentials</param-value>
+    </init-param>
+</filter>
+<filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
+
+<resource-ref>
+	<description>DB Connection</description>
+	<res-ref-name>jdbc/assetDB</res-ref-name>
+	<res-type>javax.sql.DataSource</res-type>
+	<res-auth>Container</res-auth>
+</resource-ref>
+
+</web-app>

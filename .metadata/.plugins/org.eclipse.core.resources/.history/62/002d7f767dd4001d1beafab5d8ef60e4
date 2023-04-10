@@ -1,0 +1,66 @@
+package com.jetflix;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class ImageServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	String requestedUrl = request.getRequestURI();
+    	 
+    	//Need remove duplication
+    	String str = "bg"; // This is way to insert variable in string / String.format()
+    	response.setContentType("image/jpeg");
+		String regex = "\\/images\\/bg\\/(\\d+)";
+   	 	Pattern pattern = Pattern.compile(regex);
+   	 	Matcher matcher = pattern.matcher("/images/bg/");
+   	 	String videoId = matcher.group(1);
+   	 	System.out.print(videoId);
+   	 	System.out.print(pattern);
+   	 	
+    	
+//    	if (requestedUrl.equals("/images/bg")) {
+//    		response.setContentType("image/jpeg");
+//    		String regex = "\\/images\\/bg\\/(\\d+)";
+//       	 	Pattern pattern = Pattern.compile(regex);
+//       	 	Matcher matcher = pattern.matcher("/images/bg/");
+//       	 	String videoId = matcher.group(1);
+//       	 	System.out.print(videoId);
+//       	 	
+//        	InputStream inputStream = new FileInputStream(String.format("/root/Desktop/%s.jpg",str));
+//        	OutputStream outputStream = response.getOutputStream();
+//        	byte[] buffer = new byte[4096];
+//        	int bytesRead;
+//        	while ((bytesRead = inputStream.read(buffer)) != -1) {
+//        	  outputStream.write(buffer, 0, bytesRead);
+//        	}
+//        	inputStream.close();
+//        	outputStream.close();
+//        } else if (requestedUrl.equals("/images/poster")) {
+//        	response.setContentType("image/jpeg");
+//        	String regex = "\\/images\\/poster\\/(\\d+)";
+//          	Pattern pattern = Pattern.compile(regex);
+//          	Matcher matcher = pattern.matcher("/images/poster/");
+//          	String videoId = matcher.group(1);
+//          	System.out.print(videoId); 
+//          	
+//        	InputStream inputStream = new FileInputStream("/root/Desktop/post.jpg");
+//        	OutputStream outputStream = response.getOutputStream();
+//        	byte[] buffer = new byte[4096];
+//        	int bytesRead;
+//        	while ((bytesRead = inputStream.read(buffer)) != -1) {
+//        	  outputStream.write(buffer, 0, bytesRead);
+//        	}
+//        	inputStream.close();
+//        	outputStream.close();
+//        }
+    }
+}

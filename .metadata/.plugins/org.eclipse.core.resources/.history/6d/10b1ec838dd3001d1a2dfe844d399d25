@@ -1,0 +1,42 @@
+package com.jetflix;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+public class ImageServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	String requestedUrl = request.getRequestURI();
+    	//Need remove duplication
+    	String str = "bg"; // This is way to insert variable in string / String.format("/root/Desktop/%s.jpg",str)
+    	if (requestedUrl.equals("/images/bg")) {
+    		response.setContentType("image/jpeg");
+        	InputStream inputStream = new FileInputStream(String.format("/root/Desktop/%s.jpg",str));
+        	OutputStream outputStream = response.getOutputStream();
+        	byte[] buffer = new byte[4096];
+        	int bytesRead;
+        	while ((bytesRead = inputStream.read(buffer)) != -1) {
+        	  outputStream.write(buffer, 0, bytesRead);
+        	}
+        	inputStream.close();
+        	outputStream.close();
+        } else if (requestedUrl.equals("/images/poster")) {
+        	response.setContentType("image/jpeg");
+        	InputStream inputStream = new FileInputStream("/root/Desktop/post.jpg");
+        	OutputStream outputStream = response.getOutputStream();
+        	byte[] buffer = new byte[4096];
+        	int bytesRead;
+        	while ((bytesRead = inputStream.read(buffer)) != -1) {
+        	  outputStream.write(buffer, 0, bytesRead);
+        	}
+        	inputStream.close();
+        	outputStream.close();
+        }
+    }
+}
