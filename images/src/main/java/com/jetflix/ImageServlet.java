@@ -24,7 +24,6 @@ public class ImageServlet extends HttpServlet {
         	String videoId = "";
         	if (matcher.matches()) {
         	    videoId = matcher.group(1);
-        	    System.out.print(videoId);
         	} else {
         	    System.out.print("No");
         	}
@@ -46,7 +45,6 @@ public class ImageServlet extends HttpServlet {
         	String videoId = "";
         	if (matcher.matches()) {
         	    videoId = matcher.group(1);
-        	    System.out.print(videoId);
         	} else {
         	    System.out.print("No");
         	}

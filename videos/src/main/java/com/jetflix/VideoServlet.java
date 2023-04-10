@@ -116,7 +116,6 @@ public class VideoServlet extends HttpServlet {
 			          selectStmt.setString(1, "%" + keyword + "%");
 			          ResultSet rs = selectStmt.executeQuery();
 			        
-			          System.out.println(rs.getRow());	
 			          // Convert the ResultSet to a JSONArray
 			          JSONArray jsonArray = new JSONArray();
 			          
@@ -139,6 +138,35 @@ public class VideoServlet extends HttpServlet {
 		  	    }finally {
 		  	    	out.close();
 		  	    	}
+		  	} else if(requestedUrl.contains("delete")) {
+		  	    try {
+		  	   // Connect to the MySQL database
+			          Class.forName("com.mysql.cj.jdbc.Driver");
+			          String url = "jdbc:mysql://192.168.163.30:3306/assetDB?useUnicode=true&characterEncoding=UTF-8";
+			          String username = "video_uploader";
+			          String password = "p@ssw0rd";
+			          Connection conn = DriverManager.getConnection(url, username, password);
+
+			          // Execute the DELETE query
+			          
+			          String query = "DELETE FROM asset WHERE id = ?";
+			          
+			          PreparedStatement selectStmt = conn.prepareStatement(query);
+			          int id = Integer.parseInt(requestedUrl.substring(15));
+			          selectStmt.setInt(1, id);
+			          selectStmt.executeUpdate();
+			          
+			          // DELETE directory and file
+			          File directory = new File("/mnt/assets/"+id);
+			          File[] directoryList = directory.listFiles();
+			          
+			          for(int i=0;i<directoryList.length;i++) {
+			        	  directoryList[i].delete();
+			          }
+			          directory.delete();
+		  	    } catch(Exception ex) {
+		  	    	System.out.println("An error occurred while fetching the data: " + ex.getMessage());
+		  	    }
 		  	}
 	  }
 	  
